@@ -1,0 +1,19 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: petfriends-almoxarifado
+  datasource:
+    url: jdbc:postgresql://localhost:5433/almoxarifado_db
+    username: petfriends
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest

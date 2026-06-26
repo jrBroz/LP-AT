@@ -1,0 +1,88 @@
+version: '3.8'
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - petfriends-network
+
+  postgres-pedidos:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: pedidos_db
+      POSTGRES_USER: petfriends
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    networks:
+      - petfriends-network
+
+  postgres-almoxarifado:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: almoxarifado_db
+      POSTGRES_USER: petfriends
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    networks:
+      - petfriends-network
+
+  postgres-transporte:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: transporte_db
+      POSTGRES_USER: petfriends
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5434:5432"
+    networks:
+      - petfriends-network
+
+  api-pedidos:
+    build: ./PetFriends_Pedidos
+    ports:
+      - "8080:8080"
+    depends_on:
+      - rabbitmq
+      - postgres-pedidos
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-pedidos:5432/pedidos_db
+      SPRING_RABBITMQ_HOST: rabbitmq
+    networks:
+      - petfriends-network
+
+  api-almoxarifado:
+    build: ./PetFriends_Almoxarifado
+    ports:
+      - "8081:8081"
+    depends_on:
+      - rabbitmq
+      - postgres-almoxarifado
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-almoxarifado:5432/almoxarifado_db
+      SPRING_RABBITMQ_HOST: rabbitmq
+    networks:
+      - petfriends-network
+
+  api-transporte:
+    build: ./PetFriends_Transporte
+    ports:
+      - "8082:8082"
+    depends_on:
+      - rabbitmq
+      - postgres-transporte
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-transporte:5432/transporte_db
+      SPRING_RABBITMQ_HOST: rabbitmq
+    networks:
+      - petfriends-network
+
+networks:
+  petfriends-network:
+    driver: bridge
